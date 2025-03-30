@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package subscriber;
+
+message Subscriber {
+    int32 id = 1;
+    string name_surname = 2;
+    int64 start_date = 3;
+    int64 last_accessed = 4;
+    repeated string interests = 5;
+    bool isOnline = 6;
+}

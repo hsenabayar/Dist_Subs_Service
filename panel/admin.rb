@@ -1,52 +1,21 @@
-require 'socket'
+require 'google/protobuf'
+require_relative 'dist_servers/message_pb'  # Protobuf mesajını tanımlayan dosya
 
-# Sunucuların listesi
-servers = [
-  { name: "Server1", host: "localhost", port: 5001 },
-  { name: "Server2", host: "localhost", port: 5002 },
-  { name: "Server3", host: "localhost", port: 5003 }
-]
+# Include the generated Protobuf module
+include DistServers::Message
 
-responding_servers = []
+# Örnek bir Protobuf mesajı oluşturma
+message = DistServers::Message.new
+message.field1 = 123
+message.field2 = "Example Message"
 
-# Başlangıç komutu gönder
-servers.each do |server|
-  begin
-    socket = TCPSocket.new(server[:host], server[:port])
-    message = "fault_tolerance_level=1 method=STRT"
-    socket.puts(message)
+# Protobuf mesajını ekrana yazdırma
+puts message.to_s
 
-    response = socket.gets
-    if response && response.include?("response=YEP")
-      responding_servers << server
-      puts "#{server[:name]} yanıt verdi: #{response.strip}"
-    end
-
-    socket.close
-  rescue => e
-    puts "#{server[:name]} bağlantı hatası: #{e.message}"
-  end
+# Örnek bir işlem (Protobuf mesajını bir sunucuya gönderme)
+def send_message_to_server(message)
+  # Sunucu işlemi burada gerçekleştirilebilir
+  puts "Mesaj gönderildi: #{message}"
 end
 
-# Kapasite sorguları
-loop do
-  responding_servers.each do |server|
-    begin
-      socket = TCPSocket.new(server[:host], server[:port])
-
-      # Kapasite sorgusu gönder
-      socket.puts("demand=CPCTY response=null")
-      response = socket.gets
-
-      if response
-        puts "#{server[:name]} yanıt verdi: #{response.strip}"
-      end
-
-      socket.close
-    rescue => e
-      puts "#{server[:name]} kapasite sorgusunda hata: #{e.message}"
-    end
-  end
-
-  sleep 5
-end
+send_message_to_server(message)
